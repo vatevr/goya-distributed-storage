@@ -26,7 +26,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>cc.univie.goya.manager.ManagerLauncher</mainClass>
+              <mainClass>cc.univie.goya.manager.launcher.ManagerLauncher</mainClass>
             </manifest>
           </archive>
         </configuration>

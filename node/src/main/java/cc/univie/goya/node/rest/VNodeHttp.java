@@ -18,7 +18,7 @@ public class VNodeHttp extends AbstractVerticle {
 
     vertx.createHttpServer()
         .requestHandler(application)
-        .listen(7999, asyncResult -> {
+        .listen(8500, asyncResult -> {
           if (asyncResult.succeeded()) {
             startPromise.complete();
           } else {

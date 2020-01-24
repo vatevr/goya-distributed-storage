@@ -8,6 +8,8 @@ services:
       context: ./manager
     networks:
       - overlay
+    ports:
+    - 7500:7500
 
   node:
     image: node
@@ -22,6 +24,8 @@ services:
       context: ./node/
     networks:
       - overlay
+    ports:
+    - 8500:8500
 
 networks:
   overlay:

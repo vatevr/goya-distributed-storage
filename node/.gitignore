@@ -15,7 +15,7 @@
 *.iml
 
 # compiled fodlers
-./target
+target
 
 # Package Files #
 *.jar
