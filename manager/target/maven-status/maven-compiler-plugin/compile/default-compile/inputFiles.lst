@@ -1,1 +1,3 @@
-/Users/sevazgest/Workspace/uni/cloud-computing/assignments/goya-distributed-storage/manager/src/main/java/cc/univie/goya/manager/ManagerLauncher.java
+/Users/sevazgest/Workspace/uni/cloud-computing/assignments/goya-distributed-storage/manager/src/main/java/cc/univie/goya/manager/rest/VManagerHttp.java
+/Users/sevazgest/Workspace/uni/cloud-computing/assignments/goya-distributed-storage/manager/src/main/java/cc/univie/goya/manager/launcher/VManagerRoot.java
+/Users/sevazgest/Workspace/uni/cloud-computing/assignments/goya-distributed-storage/manager/src/main/java/cc/univie/goya/manager/launcher/ManagerLauncher.java

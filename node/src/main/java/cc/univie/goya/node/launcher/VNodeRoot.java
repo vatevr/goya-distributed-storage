@@ -6,13 +6,20 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Promise;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Optional;
+
 @Slf4j
 public class VNodeRoot extends AbstractVerticle {
+  private static final String INSTANCE = "INSTANCE";
   @Override
-  public void start(Promise<Void> promise) throws Exception {
-    log.info("Root verticle starting");
+  public void start(Promise<Void> promise) {
+    int instance = Optional.ofNullable(System.getenv(INSTANCE))
+        .map(Integer::valueOf)
+        .orElseThrow(UnknownInstance::new);
 
-    vertx.deployVerticle(() -> new VNodeHttp(), new DeploymentOptions().setInstances(1), asyncResult -> {
+    log.info("starting instance {} root verticle", instance);
+
+    vertx.deployVerticle(() -> new VNodeHttp(instance ), new DeploymentOptions().setInstances(1), asyncResult -> {
       if (asyncResult.succeeded()) {
         promise.complete();
       } else {
@@ -20,5 +27,11 @@ public class VNodeRoot extends AbstractVerticle {
       }
     });
 
+  }
+
+  private static class UnknownInstance extends RuntimeException {
+    UnknownInstance() {
+      super("instance number was not set");
+    }
   }
 }

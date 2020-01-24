@@ -3,29 +3,65 @@ services:
   manager:
     image: manager
 #    command: run scala:org.univie.cc.section.launcher.VSectionRuntime
+    environment:
+      - NODES=3
     build:
       dockerfile: ./Dockerfile
       context: ./manager
     networks:
-      - overlay
+      - goya-network
     ports:
     - 7500:7500
 
-  node:
+  alpha:
     image: node
-    container_name: node
+    container_name: node0
 #    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
     environment:
-      - VERSION=1.1
+      - INSTANCE=0
     depends_on:
       - manager
     build:
       dockerfile: ./Dockerfile
       context: ./node/
-    networks:
-      - overlay
     ports:
-    - 8500:8500
+      - 8500:8500
+    networks:
+      - goya-network
+
+  bravo:
+    image: node
+    container_name: node1
+#    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
+    environment:
+      - INSTANCE=1
+    depends_on:
+      - manager
+    build:
+      dockerfile: ./Dockerfile
+      context: ./node/
+    ports:
+      - 8501:8501
+    networks:
+      - goya-network
+
+  charlie:
+    image: node
+    container_name: node2
+#    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
+    environment:
+      - INSTANCE=2
+    depends_on:
+      - manager
+    build:
+      dockerfile: ./Dockerfile
+      context: ./node/
+    ports:
+    - 8502:8502
+    networks:
+      - goya-network
 
 networks:
-  overlay:
+  goya-network:
+    driver: bridge
+    internal: false
