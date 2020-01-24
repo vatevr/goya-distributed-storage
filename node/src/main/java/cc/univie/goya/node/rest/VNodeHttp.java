@@ -4,21 +4,28 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class VNodeHttp extends AbstractVerticle {
+  private static final int DEFAULT_PORT = 8500;
+  private final int instance;
+
   @Override
   public void start(Promise<Void> startPromise) {
     log.info("starting http");
 
     Router application = Router.router(vertx);
 
-    application.get("/ping").handler(context -> this.handlePing(context));
+    application.get("/ping").handler(this::handlePing);
+
+    int port = DEFAULT_PORT + instance;
 
     vertx.createHttpServer()
         .requestHandler(application)
-        .listen(8500, asyncResult -> {
+        .listen(port, asyncResult -> {
           if (asyncResult.succeeded()) {
             startPromise.complete();
           } else {
@@ -30,6 +37,6 @@ public class VNodeHttp extends AbstractVerticle {
   private void handlePing(RoutingContext context) {
     log.info("hello request received");
 
-    context.response().setStatusCode(200).end("pong");
+    context.response().setStatusCode(200).end(String.format("pong from %d", instance));
   }
 }

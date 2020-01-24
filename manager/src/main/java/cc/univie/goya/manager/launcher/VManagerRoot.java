@@ -6,13 +6,21 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Promise;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Optional;
+
 @Slf4j
 public class VManagerRoot extends AbstractVerticle {
+    private final String NODES = "NODES";
+
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
         log.info("Managaer started");
 
-        vertx.deployVerticle(()->new VManagerHttp(), new DeploymentOptions().setInstances(1), asyncResult ->{
+        int nodes = Optional.ofNullable(System.getenv(NODES))
+            .map(Integer::valueOf)
+            .orElse(1);
+
+        vertx.deployVerticle(()->new VManagerHttp(nodes), new DeploymentOptions().setInstances(1), asyncResult ->{
             if(asyncResult.succeeded()){
                 startPromise.complete();
             } else {
