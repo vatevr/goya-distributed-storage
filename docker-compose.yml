@@ -24,8 +24,6 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./node/
-    ports:
-      - 8500:8500
     networks:
       - goya-network
 
@@ -40,8 +38,6 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./node/
-    ports:
-      - 8501:8501
     networks:
       - goya-network
 
@@ -56,8 +52,6 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./node/
-    ports:
-    - 8502:8502
     networks:
       - goya-network
 
