@@ -1,0 +1,27 @@
+version: '3'
+services:
+  manager:
+    image: manager
+#    command: run scala:org.univie.cc.section.launcher.VSectionRuntime
+    build:
+      dockerfile: ./Dockerfile
+      context: ./manager
+    networks:
+      - overlay
+
+  node:
+    image: node
+    container_name: node
+#    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
+    environment:
+      - VERSION=1.1
+    depends_on:
+      - manager
+    build:
+      dockerfile: ./Dockerfile
+      context: ./node/
+    networks:
+      - overlay
+
+networks:
+  overlay:
