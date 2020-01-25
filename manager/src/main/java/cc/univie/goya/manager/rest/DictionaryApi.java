@@ -2,6 +2,7 @@ package cc.univie.goya.manager.rest;
 
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpServerFileUpload;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -22,6 +23,15 @@ public class DictionaryApi {
 
     router.delete("/storage/:objectKey").handler(this::deleteObject);
     router.get("/storage/:objectKey").handler(this::searchObject);
+
+    {
+      router.post("/test/upload")
+        .handler(BodyHandler.create().setUploadsDirectory("./").setBodyLimit(-1))
+        .handler(context -> {
+          context.fileUploads().forEach(f -> log.info("filename {}", f.fileName()));
+          context.response().end();
+        });
+    }
   }
 
   private void searchObject(RoutingContext context) {
@@ -29,7 +39,10 @@ public class DictionaryApi {
     log.info("handling search for {}", objectKey);
 
     this.gateway.getFromNode(objectKey).compose(binary -> {
-      context.response().setStatusCode(200).end(binary);
+      context.response()
+          .setStatusCode(200)
+          .end(binary);
+
       return Future.succeededFuture();
     }).recover(err -> {
       log.error("failed to search for object from node {}", objectKey, err);
