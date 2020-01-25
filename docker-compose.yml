@@ -2,7 +2,7 @@ version: '3'
 services:
   manager:
     image: manager
-#    command: run scala:org.univie.cc.section.launcher.VSectionRuntime
+    #    command: run scala:org.univie.cc.section.launcher.VSectionRuntime
     environment:
       - NODES=3
     build:
@@ -11,12 +11,12 @@ services:
     networks:
       - goya-network
     ports:
-    - 7500:7500
+      - 7500:7500
 
   alpha:
     image: node
     container_name: node0
-#    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
+    #    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
     environment:
       - INSTANCE=0
     depends_on:
@@ -26,11 +26,13 @@ services:
       context: ./node/
     networks:
       - goya-network
+    volumes:
+      - alpha-storage:/storage
 
   bravo:
     image: node
     container_name: node1
-#    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
+    #    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
     environment:
       - INSTANCE=1
     depends_on:
@@ -40,11 +42,14 @@ services:
       context: ./node/
     networks:
       - goya-network
+    volumes:
+      - bravo-storage:/storage
+
 
   charlie:
     image: node
     container_name: node2
-#    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
+    #    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
     environment:
       - INSTANCE=2
     depends_on:
@@ -54,8 +59,34 @@ services:
       context: ./node/
     networks:
       - goya-network
+    volumes:
+      - charlie-storage:/storage
+
+  monkey:
+    image: node
+    container_name: node3
+    #    command: run scala:org.univie.cc.collector.runtime.VCollectorLauncher
+    environment:
+      - INSTANCE=3
+    depends_on:
+      - manager
+    build:
+      dockerfile: ./Dockerfile
+      context: ./node/
+    ports:
+      - 8503:8503
+    networks:
+      - goya-network
+    volumes:
+      - /storage
+
 
 networks:
   goya-network:
     driver: bridge
     internal: false
+
+volumes:
+  alpha-storage:
+  bravo-storage:
+  charlie-storage:
