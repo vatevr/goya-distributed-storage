@@ -1,8 +1,11 @@
 package cc.univie.goya.manager.rest;
 
 import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +16,10 @@ public class DictionaryApi {
   private final Gateway gateway;
 
   public void attach(@NonNull Router router) {
-    router.post("/storage/:objectKey").handler(this::handlePutObject);
+    router.post("/storage/:objectKey")
+        .handler(BodyHandler.create().setBodyLimit(-1))
+        .handler(this::handlePutObject);
+
     router.delete("/storage/:objectKey").handler(this::deleteObject);
     router.get("/storage/:objectKey").handler(this::searchObject);
   }
@@ -45,13 +51,26 @@ public class DictionaryApi {
 
   private void handlePutObject(RoutingContext context) {
     String objectKey = context.pathParam("objectKey");
+    Buffer binary = context.getBody();
 
-    this.gateway.uploadToNode(objectKey).compose(response -> {
-      context.response().setStatusCode(200).end(response.encode());
+    this.gateway.uploadToNode(objectKey, binary).compose(ignoredResponse -> {
+      context.response().setStatusCode(200).end(success(objectKey).encode());
       return Future.succeededFuture();
     }).recover(err -> {
       log.error("failed to put object to node {}", objectKey, err);
+      context.response()
+          .setStatusCode(500)
+          .end(internalServerERror().encode());
+
       return Future.failedFuture(err);
     });
+  }
+
+  private static JsonObject internalServerERror() {
+    return new JsonObject().put("message", "internal server error");
+  }
+
+  private static JsonObject success(@NonNull String objectKey) {
+    return new JsonObject().put("message", "success").put("objectKey", objectKey);
   }
 }
