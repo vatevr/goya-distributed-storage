@@ -6,6 +6,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -29,16 +30,16 @@ public class Gateway {
     return objectKey.hashCode() % nodes;
   }
 
-  Future<JsonObject> uploadToNode(String objectKey) {
+  Future<String> uploadToNode(@NonNull String objectKey, @NonNull Buffer buffer) {
     Promise<HttpResponse<Buffer>> whenResponded = Promise.promise();
 
     int hash = hashCode(objectKey);
 
     this.webclient
-        .post(port(hash), host(hash), "/ping")
-        .send(whenResponded);
+        .post(port(hash), host(hash), "/object/" + objectKey)
+        .sendBuffer(buffer, whenResponded);
 
-    return whenResponded.future().map(HttpResponse::bodyAsJsonObject);
+    return whenResponded.future().map(HttpResponse::bodyAsString);
   }
 
   public Future<JsonObject> deleteFromNode(String objectKey) {
@@ -47,7 +48,7 @@ public class Gateway {
     int hash = hashCode(objectKey);
 
     this.webclient
-        .delete(port(hash), host(hash), "/ping")
+        .delete(port(hash), host(hash), "/object/" + objectKey)
         .send(whenResponded);
 
     return whenResponded.future().map(HttpResponse::bodyAsJsonObject);
@@ -59,7 +60,7 @@ public class Gateway {
     int hash = hashCode(objectKey);
 
     this.webclient
-        .get(port(hash), host(hash), "/ping")
+        .get(port(hash), host(hash), "object/" + objectKey)
         .send(whenResponded);
 
     return whenResponded.future().map(HttpResponse::bodyAsBuffer);
