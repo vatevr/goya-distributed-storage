@@ -4,6 +4,8 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -12,8 +14,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import sun.reflect.generics.tree.VoidDescriptor;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,6 +41,7 @@ public class VNodeHttp extends AbstractVerticle {
                 .handler(this::storeObject);
         application.delete("/object/:key").handler(this::deleteObject);
         application.get("/object/:key").handler(this::searchObject);
+        application.get("/keys").handler(this::storageKeys);
 
         int port = DEFAULT_PORT + instance;
 
@@ -94,5 +102,44 @@ public class VNodeHttp extends AbstractVerticle {
                 context.fail(asyncResponse.cause());
             }
         });
+    }
+
+    private void storageKeys(RoutingContext context) {
+        log.info("scanning the storage");
+        vertx.fileSystem().readDir(storagePath, asyncResult -> {
+            if (asyncResult.succeeded()) {
+                final JsonArray keys = new JsonArray();
+                Function<List<String>, String> lastElement = list -> list.get(list.size() - 1);
+                Predicate<List<String>> empty = List::isEmpty;
+
+                asyncResult.result().stream()
+                        .map(key -> key.split("/"))
+                        .map(Arrays::asList)
+                        .filter(empty.negate())
+                        .map(lastElement)
+                        .forEach(keys::add);
+
+                context.response().setStatusCode(200).end(new JsonObject().put("keys", keys).encode());
+            } else {
+                log.error("could not find files");
+                context.fail(asyncResult.cause());
+            }
+
+        });
+    }
+
+    public static void main(String[] args) {
+        String lala = "/storage/lalala";
+        String lala1 = "/storage/lalal1";
+        List<String> strings = Arrays.asList(lala, lala1);
+
+        Function<List<String>, String> lastElement = list -> list.get(list.size() - 1);
+
+        strings.stream()
+                .map(key -> key.split("/"))
+                .map(Arrays::asList)
+                .filter(list -> !list.isEmpty())
+                .map(lastElement)
+                .forEach(System.out::println);
     }
 }
