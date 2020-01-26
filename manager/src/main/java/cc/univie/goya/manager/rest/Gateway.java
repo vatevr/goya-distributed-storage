@@ -12,7 +12,9 @@ import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.codec.BodyCodec;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
+@Slf4j
 public class Gateway {
   private static final int DEFAULT_PORT = 8500;
   private final WebClient webclient;
@@ -45,6 +48,8 @@ public class Gateway {
 
     int hash = hashCode(objectKey);
 
+    log.info("uploading to node {}", hash);
+
     this.webclient
         .post(port(hash), host(hash), "/object/" + objectKey)
         .sendBuffer(buffer, whenResponded);
@@ -56,6 +61,8 @@ public class Gateway {
     Promise<HttpResponse<Buffer>> whenResponded = Promise.promise();
 
     int hash = hashCode(objectKey);
+
+    log.info("deleting from node {}", hash);
 
     this.webclient
         .delete(port(hash), host(hash), "/object/" + objectKey)
@@ -69,13 +76,15 @@ public class Gateway {
 
     int hash = hashCode(objectKey);
 
-    buildGet(hash, "object/" + objectKey)
+    log.info("getting from node {}", hash);
+
+    buildGet(hash, "/object/" + objectKey)
         .send(whenResponded);
 
     return whenResponded.future().map(HttpResponse::bodyAsBuffer);
   }
 
-  public Future<JsonObject> keysFromNodes() {
+  public Future<List> keysFromNodes() {
     List<Future> requests = IntStream.range(0, nodes)
         .mapToObj(node -> buildGet(node, "/keys").as(BodyCodec.jsonObject()))
         .map(request -> {
@@ -93,13 +102,7 @@ public class Gateway {
                 .orElse(new JsonArray())
             )
         )
-        .map(keysStream -> {
-          JsonObject jsonObject = new JsonObject();
-          JsonArray aggregate = new JsonArray();
-          keysStream.forEach(aggregate::addAll);
-
-          return jsonObject.put("keys", aggregate);
-        });
+        .map(keysStream -> keysStream.map(JsonArray::getList).flatMap(Collection::stream).collect(Collectors.toList()));
   }
 
   private HttpRequest<Buffer> buildGet(int node, String s) {

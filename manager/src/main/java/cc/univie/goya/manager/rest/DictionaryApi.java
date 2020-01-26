@@ -2,6 +2,7 @@ package cc.univie.goya.manager.rest;
 
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -10,6 +11,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 @Slf4j
@@ -41,7 +43,20 @@ public class DictionaryApi {
     String to = Objects.requireNonNull(context.queryParams().get("to"));
 
     this.gateway.keysFromNodes().compose(keys -> {
-      context.response().setStatusCode(200).end(keys.encode());
+      JsonObject response = new JsonObject();
+      JsonArray aggreagate = new JsonArray();
+      keys.stream()
+          .filter(key -> {
+            if (key instanceof String) {
+              String keyAsString = ((String) key);
+              return keyAsString.compareToIgnoreCase(from) >= 0 && keyAsString.compareTo(to) < 0;
+            }
+
+            return false;
+          })
+          .forEach(aggreagate::add);
+
+      context.response().setStatusCode(200).end(response.put("keys", aggreagate).encode());
       return Future.succeededFuture();
     }).recover(err -> {
       log.error("failed to search keys from {} to {}", from, to, err);
