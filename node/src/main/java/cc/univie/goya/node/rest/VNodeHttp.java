@@ -1,26 +1,21 @@
 package cc.univie.goya.node.rest;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import sun.reflect.generics.tree.VoidDescriptor;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -72,7 +67,9 @@ public class VNodeHttp extends AbstractVerticle {
                 context.response().setStatusCode(201).end("saved file");
             } else {
                 log.error("failed to save the file", asyncResult.cause());
-                context.fail(asyncResult.cause());
+                context.response()
+                    .setStatusCode(500)
+                    .end("internal server error");
             }
         });
 
@@ -83,10 +80,14 @@ public class VNodeHttp extends AbstractVerticle {
         String key = context.pathParam("key");
         vertx.fileSystem().delete(String.format("%s%s%s",storagePath, "/", key), asyncResult ->{
             if(asyncResult.succeeded()){
-                context.response().setStatusCode(202).end("deleted file");
+                context.response()
+                    .setStatusCode(202)
+                    .end(new JsonObject().put("message", key + " successfully deleted").encode());
             } else{
                 log.error("failed to delete", asyncResult.cause());
-                context.fail(asyncResult.cause());
+                context.response()
+                    .setStatusCode(400)
+                    .end(new JsonObject().put("message", key + " doesn't exist").encode());
             }
         });
     }
@@ -96,10 +97,13 @@ public class VNodeHttp extends AbstractVerticle {
         String key = context.pathParam("key");
         vertx.fileSystem().readFile(String.format("%s%s%s", storagePath, "/", key), asyncResponse -> {
             if (asyncResponse.succeeded()) {
+                log.info("file {} found writing the response", key);
                 context.response().setStatusCode(200).end(asyncResponse.result());
             } else {
                 log.error("file not found");
-                context.fail(asyncResponse.cause());
+                context.response()
+                    .setStatusCode(400)
+                    .end(new JsonObject().put("message", key + " doesn't exist").encode());
             }
         });
     }
