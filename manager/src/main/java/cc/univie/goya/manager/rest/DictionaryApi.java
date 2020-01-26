@@ -2,7 +2,6 @@ package cc.univie.goya.manager.rest;
 
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpServerFileUpload;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -11,6 +10,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
+
 @Slf4j
 @RequiredArgsConstructor
 public class DictionaryApi {
@@ -18,11 +19,12 @@ public class DictionaryApi {
 
   public void attach(@NonNull Router router) {
     router.post("/storage/:objectKey")
-        .handler(BodyHandler.create().setBodyLimit(-1))
+        .handler(BodyHandler.create(true).setBodyLimit(-1))
         .handler(this::handlePutObject);
 
-    router.delete("/storage/:objectKey").handler(this::deleteObject);
-    router.get("/storage/:objectKey").handler(this::searchObject);
+    router.delete("/storage/:objectKey").handler(this::handleDeleteObject);
+    router.get("/storage/:objectKey").handler(this::handleSearchObject);
+    router.get("/storage").handler(this::handleRangeSearch);
 
     {
       router.post("/test/upload")
@@ -34,7 +36,25 @@ public class DictionaryApi {
     }
   }
 
-  private void searchObject(RoutingContext context) {
+  private void handleRangeSearch(RoutingContext context) {
+    String from = Objects.requireNonNull(context.queryParams().get("from"));
+    String to = Objects.requireNonNull(context.queryParams().get("to"));
+
+    this.gateway.keysFromNodes().compose(keys -> {
+      context.response().setStatusCode(200).end(keys.encode());
+      return Future.succeededFuture();
+    }).recover(err -> {
+      log.error("failed to search keys from {} to {}", from, to, err);
+
+      context.response()
+          .setStatusCode(500)
+          .end(internalServerERror().encode());
+
+      return Future.failedFuture(err);
+    });
+  }
+
+  private void handleSearchObject(RoutingContext context) {
     String objectKey = context.pathParam("objectKey");
     log.info("handling search for {}", objectKey);
 
@@ -46,11 +66,16 @@ public class DictionaryApi {
       return Future.succeededFuture();
     }).recover(err -> {
       log.error("failed to search for object from node {}", objectKey, err);
+
+      context.response()
+          .setStatusCode(500)
+          .end(internalServerERror().encode());
+
       return Future.failedFuture(err);
     });
   }
 
-  private void deleteObject(RoutingContext context) {
+  private void handleDeleteObject(RoutingContext context) {
     String objectKey = context.pathParam("objectKey");
     log.info("handling delete for {}", objectKey);
     this.gateway.deleteFromNode(objectKey).compose(response -> {
@@ -58,6 +83,10 @@ public class DictionaryApi {
       return Future.succeededFuture();
     }).recover(err -> {
       log.error("failed to delete object from node {}", objectKey, err);
+      context.response()
+          .setStatusCode(500)
+          .end(internalServerERror().encode());
+
       return Future.failedFuture(err);
     });
   }
@@ -67,6 +96,7 @@ public class DictionaryApi {
     Buffer binary = context.getBody();
 
     this.gateway.uploadToNode(objectKey, binary).compose(ignoredResponse -> {
+      log.info("response from node");
       context.response().setStatusCode(200).end(success(objectKey).encode());
       return Future.succeededFuture();
     }).recover(err -> {

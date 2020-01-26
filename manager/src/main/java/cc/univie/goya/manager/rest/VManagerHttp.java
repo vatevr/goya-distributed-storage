@@ -31,6 +31,11 @@ public class VManagerHttp extends AbstractVerticle {
     DictionaryApi api = new DictionaryApi(gateway);
     api.attach(application);
 
+    application.route().failureHandler(context -> {
+      log.error("failed", context.failure());
+      context.response().end("internal server err");
+    });
+
     vertx.createHttpServer()
         .requestHandler(application)
         .listen(7500, asyncResult -> {

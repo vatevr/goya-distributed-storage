@@ -1,13 +1,21 @@
 package cc.univie.goya.manager.rest;
 
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.codec.BodyCodec;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 public class Gateway {
@@ -59,10 +67,35 @@ public class Gateway {
 
     int hash = hashCode(objectKey);
 
-    this.webclient
-        .get(port(hash), host(hash), "object/" + objectKey)
+    buildGet(hash, "object/" + objectKey)
         .send(whenResponded);
 
     return whenResponded.future().map(HttpResponse::bodyAsBuffer);
+  }
+
+  public Future<JsonObject> keysFromNodes() {
+    List<Future> requests = IntStream.range(0, nodes)
+        .mapToObj(node -> buildGet(node, "/keys").as(BodyCodec.jsonObject()))
+        .map(request -> {
+          Promise<HttpResponse<JsonObject>> whenSent = Promise.promise();
+          request.send(whenSent);
+          return whenSent.future();
+        })
+        .collect(Collectors.toList());
+
+    return CompositeFuture.join(requests)
+        .map(CompositeFuture::<HttpResponse<JsonObject>>list)
+        .map(responses -> responses.stream().map(response -> response.bodyAsJsonObject().getJsonArray("keys")))
+        .map(keysStream -> {
+          JsonObject jsonObject = new JsonObject();
+          JsonArray aggregate = new JsonArray();
+          keysStream.forEach(aggregate::addAll);
+
+          return jsonObject.put("kes", aggregate);
+        });
+  }
+
+  private HttpRequest<Buffer> buildGet(int node, String s) {
+    return this.webclient.get(port(node), host(node), s);
   }
 }
