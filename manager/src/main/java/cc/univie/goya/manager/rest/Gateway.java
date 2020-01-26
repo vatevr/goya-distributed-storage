@@ -14,6 +14,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -85,13 +87,18 @@ public class Gateway {
 
     return CompositeFuture.join(requests)
         .map(CompositeFuture::<HttpResponse<JsonObject>>list)
-        .map(responses -> responses.stream().map(response -> response.bodyAsJsonObject().getJsonArray("keys")))
+        .map(responses -> responses.stream()
+            .map(response -> Optional.ofNullable(response.body())
+                .map(json -> json.getJsonArray("keys"))
+                .orElse(new JsonArray())
+            )
+        )
         .map(keysStream -> {
           JsonObject jsonObject = new JsonObject();
           JsonArray aggregate = new JsonArray();
           keysStream.forEach(aggregate::addAll);
 
-          return jsonObject.put("kes", aggregate);
+          return jsonObject.put("keys", aggregate);
         });
   }
 
