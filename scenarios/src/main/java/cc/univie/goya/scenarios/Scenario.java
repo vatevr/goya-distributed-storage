@@ -10,15 +10,6 @@ public interface Scenario {
   Future<Void> run();
 
   @Slf4j
-  class UploadScenario implements Scenario {
-    @Override
-    public Future<Void> run() {
-      log.info("uploading...");
-      return Future.succeededFuture();
-    }
-  }
-
-  @Slf4j
   class SequentialScenario implements Scenario {
     private final List<Scenario> scenarios = new ArrayList<>();
     private Iterator<Scenario> iterator = null;
