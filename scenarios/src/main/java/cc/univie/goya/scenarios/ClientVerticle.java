@@ -9,20 +9,22 @@ import lombok.extern.slf4j.Slf4j;
 public class ClientVerticle extends AbstractVerticle {
   @Override
   public void start(Promise<Void> promise) {
-    this.runScenarios().setHandler(promise);
+    promise.complete();
+    this.runUploadsAndDownloads();
   }
 
-  private Future<Void> runScenarios() {
-    Scenario.SequentialScenario scenario = new Scenario.SequentialScenario("2 uploads and 2 downloads");
-    ScenariosFactory factory = new ScenariosFactory(vertx);
+  private Future<Void> runUploadsAndDownloads() {
+    Scenario.SequentialScenario sequential = new Scenario.SequentialScenario("3 uploads and 3 downloads");
+    ScenariosFactory scenario = new ScenariosFactory(vertx);
 
-    scenario.add(factory.upload("baz.jpeg"))
-        .add(factory.upload("foo.jpeg"))
-        .add(factory.download("foo.jpeg"))
-        .add(factory.download("bar.jpeg"));
+    sequential.add(scenario.upload("baz.jpeg"))
+        .add(scenario.upload("foo.jpeg"))
+        .add(scenario.upload("baz.jpeg"))
+        .add(scenario.download("foo.jpeg"))
+        .add(scenario.download("baz.jpeg"));
 
-    return scenario.fromBeginning().run().compose(ignored -> {
-      log.info("scenario {} complete", scenario.getName());
+    return sequential.fromBeginning().run().compose(ignored -> {
+      log.info("scenario {} complete", sequential.getName());
       return Future.succeededFuture();
     });
   }
