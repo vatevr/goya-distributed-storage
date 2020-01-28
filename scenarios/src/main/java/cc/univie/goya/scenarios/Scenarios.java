@@ -17,20 +17,23 @@ class Scenarios {
   private final Vertx vertx;
   private final WebClient webclient;
   private final String path;
+  private final String host;
+  private final int port;
 
   Scenarios(Vertx vertx) {
     this.vertx = vertx;
     this.webclient = WebClient.create(this.vertx);
     this.path = "scenarios/fixtures/";
+
+
+    this.host = Optional.ofNullable(System.getenv("HOST")).orElse("localhost");
+    this.port = Optional.ofNullable(System.getenv("PORT")).map(Integer::valueOf).orElse(7500);
   }
 
   Scenario upload(String key) {
     return () -> {
       log.info("uploading {}", key);
       Promise<HttpResponse<JsonObject>> promise = Promise.promise();
-
-      String host = Optional.ofNullable(System.getenv("HOST")).orElse("localhost");
-      int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::valueOf).orElse(7500);
 
       vertx.fileSystem().readFile(this.path + "/uploads/" + key, ar -> {
         if (ar.succeeded()) {
@@ -55,11 +58,7 @@ class Scenarios {
     return () -> {
       log.info("downloading {}", key);
 
-      log.info("uploading {}", key);
       Promise<HttpResponse<Buffer>> promise = Promise.promise();
-
-      String host = Optional.ofNullable(System.getenv("HOST")).orElse("localhost");
-      int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::valueOf).orElse(7500);
 
       webclient.get(port, host, "/storage/" + key)
           .as(BodyCodec.buffer())
@@ -83,7 +82,33 @@ class Scenarios {
     };
   }
 
-  public Scenario delete(String s) {
-    return null;
+  Scenario delete(String key) {
+    return () -> {
+      Promise<HttpResponse<JsonObject>> promise = Promise.promise();
+      this.webclient.delete(port, host, "/storage/" + key)
+          .as(BodyCodec.jsonObject())
+          .send(promise);
+
+      return promise.future().compose(response -> {
+        log.info("received response from delete {}", response.body());
+        return Future.succeededFuture();
+      }).mapEmpty();
+    };
+  }
+
+  Scenario rangeQuery(String from, String to) {
+    return () -> {
+      Promise<HttpResponse<JsonObject>> promise = Promise.promise();
+      this.webclient.get(port, host, "/storage")
+          .addQueryParam("from", from)
+          .addQueryParam("to", to)
+          .as(BodyCodec.jsonObject())
+          .send(promise);
+
+      return promise.future().compose(response -> {
+        log.info("followings keys are between {} and {} {}", from, to, response.body().getJsonArray("keys"));
+        return Future.succeededFuture();
+      }).mapEmpty();
+    };
   }
 }

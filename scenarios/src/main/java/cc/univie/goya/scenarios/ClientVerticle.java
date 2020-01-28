@@ -6,10 +6,7 @@ import io.vertx.core.Promise;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.IntStream;
 
 @Slf4j
 public class ClientVerticle extends AbstractVerticle {
@@ -32,13 +29,14 @@ public class ClientVerticle extends AbstractVerticle {
 
   @Override
   public void start(Promise<Void> promise) {
-    promise.complete();
-    this.runUploadsAndDownloads();
+    this.runUploadsAndDownloads()
+        .compose(ignored -> runDelete())
+        .compose(ignored -> runUploadAllAndRangeQuery())
+        .compose(ignored -> runDeleteAll())
+        .setHandler(promise);
   }
 
   private Future<Void> runUploadsAndDownloads() {
-    List<String> filesToSelect = Collections.unmodifiableList(PAINTINGS);
-
     Scenario.SequentialScenario sequential = new Scenario.SequentialScenario("3 uploads and 2 downloads");
     Scenarios scenarios = new Scenarios(vertx);
 
@@ -48,15 +46,10 @@ public class ClientVerticle extends AbstractVerticle {
         .add(scenarios.download("Rembrandt.jpg"))
         .add(scenarios.download("Albrecht.jpg"));
 
-    return sequential.fromBeginning().run().compose(ignored -> {
-      log.info("sequential scenario {} complete", sequential.getName());
-      return Future.succeededFuture();
-    });
+    return sequential.fromBeginning().run().compose(ignored -> logAndComplete(sequential));
   }
 
   private Future<Void> runDelete() {
-    List<String> filesToSelect = Collections.unmodifiableList(PAINTINGS);
-
     Scenario.SequentialScenario sequential = new Scenario.SequentialScenario("3 uploads and 2 downloads");
     Scenarios scenarios = new Scenarios(vertx);
 
@@ -66,11 +59,35 @@ public class ClientVerticle extends AbstractVerticle {
         .add(scenarios.download("Rembrandt.jpg"))
         .add(scenarios.download("Albrecht.jpg"));
 
-    return sequential.fromBeginning().run().compose(ignored -> {
-      log.info("sequential scenario {} complete", sequential.getName());
-      return Future.succeededFuture();
-    });
+    return sequential.fromBeginning().run().compose(ignored -> logAndComplete(sequential));
   }
 
+  private Future<Void> runUploadAllAndRangeQuery() {
+    Scenario.SequentialScenario sequential = new Scenario.SequentialScenario("Upload all, range query, delete and download some");
+    Scenarios scenarios = new Scenarios(vertx);
 
+    PAINTINGS.stream()
+        .map(scenarios::upload)
+        .forEach(sequential::add);
+
+    sequential.add(scenarios.rangeQuery("Goya", "Titan"));
+
+    return sequential.fromBeginning().run().compose(ignored -> logAndComplete(sequential));
+  }
+
+  private Future<Void> runDeleteAll() {
+    Scenario.SequentialScenario sequential = new Scenario.SequentialScenario("Delete all uploads");
+    Scenarios scenarios = new Scenarios(vertx);
+
+    PAINTINGS.stream()
+        .map(scenarios::delete)
+        .forEach(sequential::add);
+
+    return sequential.fromBeginning().run().compose(ignored -> logAndComplete(sequential));
+  }
+
+  private Future<Void> logAndComplete(Scenario.SequentialScenario sequential) {
+    log.info("sequential scenario {} complete", sequential.getName());
+    return Future.succeededFuture();
+  }
 }
