@@ -1,0 +1,74 @@
+ INFO [23:14:34,883] [vert.x-eventloop-thread-0] (Scenarios.java:32) - connecting to manager:7500
+ INFO [23:14:34,885] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Albrecht.jpg
+ INFO [23:14:35,482] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Albrecht.jpg"}
+ INFO [23:14:35,482] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Goya.jpg
+ INFO [23:14:35,568] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Goya.jpg"}
+ INFO [23:14:35,568] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Rembrandt.jpg
+ INFO [23:14:35,596] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Rembrandt.jpg"}
+ INFO [23:14:35,597] [vert.x-eventloop-thread-0] (Scenarios.java:61) - downloading Rembrandt.jpg
+ INFO [23:14:35,611] [vert.x-eventloop-thread-0] (Scenarios.java:71) - received response
+ INFO [23:14:35,613] [vert.x-eventloop-thread-0] (Scenarios.java:76) - download complete
+ INFO [23:14:35,614] [vert.x-eventloop-thread-0] (Scenarios.java:61) - downloading Albrecht.jpg
+ INFO [23:14:35,626] [vert.x-eventloop-thread-0] (Scenarios.java:71) - received response
+ INFO [23:14:35,628] [vert.x-eventloop-thread-0] (Scenarios.java:76) - download complete
+ INFO [23:14:35,628] [vert.x-eventloop-thread-0] (ClientVerticle.java:90) - sequential scenario 3 uploads and 2 downloads complete
+ INFO [23:14:35,628] [vert.x-eventloop-thread-0] (Scenarios.java:32) - connecting to manager:7500
+ INFO [23:14:35,751] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Albrecht.jpg successfully deleted"}
+ INFO [23:14:35,855] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Goya.jpg successfully deleted"}
+ INFO [23:14:35,860] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Rembrandt.jpg successfully deleted"}
+ INFO [23:14:35,860] [vert.x-eventloop-thread-0] (Scenarios.java:61) - downloading Rembrandt.jpg
+ INFO [23:14:35,866] [vert.x-eventloop-thread-0] (Scenarios.java:71) - received response
+ INFO [23:14:35,867] [vert.x-eventloop-thread-0] (Scenarios.java:76) - download complete
+ INFO [23:14:35,867] [vert.x-eventloop-thread-0] (Scenarios.java:61) - downloading Albrecht.jpg
+ INFO [23:14:35,872] [vert.x-eventloop-thread-0] (Scenarios.java:71) - received response
+ INFO [23:14:35,873] [vert.x-eventloop-thread-0] (Scenarios.java:76) - download complete
+ INFO [23:14:35,874] [vert.x-eventloop-thread-0] (ClientVerticle.java:90) - sequential scenario 3 uploads and 2 downloads complete
+ INFO [23:14:35,874] [vert.x-eventloop-thread-0] (Scenarios.java:32) - connecting to manager:7500
+ INFO [23:14:35,877] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Albrecht.jpg
+ INFO [23:14:35,890] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Albrecht.jpg"}
+ INFO [23:14:35,890] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Bruegel.jpg
+ INFO [23:14:35,973] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Bruegel.jpg"}
+ INFO [23:14:35,974] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Bruegel2.jpg
+ INFO [23:14:35,982] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Bruegel2.jpg"}
+ INFO [23:14:35,982] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Durer.jpg
+ INFO [23:14:35,991] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Durer.jpg"}
+ INFO [23:14:35,991] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Frida.jpg
+ INFO [23:14:35,999] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Frida.jpg"}
+ INFO [23:14:35,999] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Goya.jpg
+ INFO [23:14:36,006] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Goya.jpg"}
+ INFO [23:14:36,006] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Magritte.jpg
+ INFO [23:14:36,014] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Magritte.jpg"}
+ INFO [23:14:36,014] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Raphael.jpg
+ INFO [23:14:36,023] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Raphael.jpg"}
+ INFO [23:14:36,023] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Raphael2.jpg
+ INFO [23:14:36,031] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Raphael2.jpg"}
+ INFO [23:14:36,031] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Rembrandt.jpg
+ INFO [23:14:36,046] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Rembrandt.jpg"}
+ INFO [23:14:36,046] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Renoir.jpg
+ INFO [23:14:36,054] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Renoir.jpg"}
+ INFO [23:14:36,054] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading Titan.jpg
+ INFO [23:14:36,062] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"Titan.jpg"}
+ INFO [23:14:36,062] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading VanGogh.jpg
+ INFO [23:14:36,071] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"VanGogh.jpg"}
+ INFO [23:14:36,072] [vert.x-eventloop-thread-0] (Scenarios.java:37) - uploading William.jpg
+ INFO [23:14:36,078] [vert.x-eventloop-thread-0] (Scenarios.java:53) - received response {"message":"success","objectKey":"William.jpg"}
+ INFO [23:14:36,205] [vert.x-eventloop-thread-0] (Scenarios.java:111) - followings keys are between Goya and Titan ["Rembrandt.jpg","Goya.jpg","Renoir.jpg","Raphael2.jpg","Magritte.jpg","Raphael.jpg"]
+ INFO [23:14:36,206] [vert.x-eventloop-thread-0] (ClientVerticle.java:90) - sequential scenario Upload all, range query, delete and download some complete
+ INFO [23:14:36,206] [vert.x-eventloop-thread-0] (Scenarios.java:32) - connecting to manager:7500
+ INFO [23:14:36,213] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Albrecht.jpg successfully deleted"}
+ INFO [23:14:36,219] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Bruegel.jpg successfully deleted"}
+ INFO [23:14:36,224] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Bruegel2.jpg successfully deleted"}
+ INFO [23:14:36,228] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Durer.jpg successfully deleted"}
+ INFO [23:14:36,233] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Frida.jpg successfully deleted"}
+ INFO [23:14:36,238] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Goya.jpg successfully deleted"}
+ INFO [23:14:36,243] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Magritte.jpg successfully deleted"}
+ INFO [23:14:36,248] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Raphael.jpg successfully deleted"}
+ INFO [23:14:36,254] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Raphael2.jpg successfully deleted"}
+ INFO [23:14:36,259] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Rembrandt.jpg successfully deleted"}
+ INFO [23:14:36,264] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Renoir.jpg successfully deleted"}
+ INFO [23:14:36,269] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"Titan.jpg successfully deleted"}
+ INFO [23:14:36,275] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"VanGogh.jpg successfully deleted"}
+ INFO [23:14:36,280] [vert.x-eventloop-thread-0] (Scenarios.java:95) - received response from delete {"message":"William.jpg successfully deleted"}
+ INFO [23:14:36,280] [vert.x-eventloop-thread-0] (ClientVerticle.java:90) - sequential scenario Delete all uploads complete
+ INFO [23:14:36,281] [vert.x-eventloop-thread-1] (ClientLauncher.java:15) - deployed b77df326-c2c5-49d0-87d9-2d8dbc4dafe6
+ INFO [23:14:36,288] [vert.x-eventloop-thread-1] (ClientLauncher.java:18) - gracefully shutting down the client launcher
