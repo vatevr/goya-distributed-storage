@@ -28,6 +28,8 @@ class Scenarios {
 
     this.host = Optional.ofNullable(System.getenv("HOST")).orElse("localhost");
     this.port = Optional.ofNullable(System.getenv("PORT")).map(Integer::valueOf).orElse(7500);
+
+    log.info("connecting to {}:{}", host, port);
   }
 
   Scenario upload(String key) {
