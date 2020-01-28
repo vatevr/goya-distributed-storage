@@ -40,7 +40,7 @@ public class Gateway {
    * Hash function to hash request to node
    */
   private int hashCode(String objectKey) {
-    return objectKey.hashCode() % nodes;
+    return Math.abs(objectKey.hashCode()) % nodes;
   }
 
   Future<String> uploadToNode(@NonNull String objectKey, @NonNull Buffer buffer) {
