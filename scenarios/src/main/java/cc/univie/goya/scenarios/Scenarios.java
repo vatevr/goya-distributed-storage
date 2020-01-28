@@ -13,12 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Optional;
 
 @Slf4j
-class ScenariosFactory {
+class Scenarios {
   private final Vertx vertx;
   private final WebClient webclient;
   private final String path;
 
-  ScenariosFactory(Vertx vertx) {
+  Scenarios(Vertx vertx) {
     this.vertx = vertx;
     this.webclient = WebClient.create(this.vertx);
     this.path = "scenarios/fixtures/";
@@ -81,5 +81,9 @@ class ScenariosFactory {
       })
       .mapEmpty();
     };
+  }
+
+  public Scenario delete(String s) {
+    return null;
   }
 }
